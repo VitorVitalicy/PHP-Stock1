@@ -1,4 +1,3 @@
-<?php
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -24,9 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $success = mysqli_stmt_execute($stmt);
     } else {
         // Adiciona o produto ao carrinho se não estiver presente
-        $query = "INSERT INTO carrinho (id_produto, nome_produto, preco_produto, quantidade) VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO carrinho (id_produto, quantidade) VALUES (?, ?)";
         $stmt = mysqli_prepare($conexao, $query);
-        mysqli_stmt_bind_param($stmt, "issi", $idProduto, $nomeProduto, $precoProduto, $quantidade);
+        mysqli_stmt_bind_param($stmt, "ii", $idProduto, $quantidade);
         $success = mysqli_stmt_execute($stmt);
     }
 

@@ -29,73 +29,71 @@
                 </tr>
             </thead>
             <?php
-            session_start();
 
-            if (!isset($_SESSION['usuario'])) {
-                header('Location: index.php');
-                exit();
-            }
+if (!isset($_SESSION['usuario'])) {
+    header('Location: index.php');
+    exit();
+}
 
-            include 'conexao.php';
+include 'conexao.php';
 
-            $usuario = $_SESSION['usuario'];
+$usuario = $_SESSION['usuario'];
 
-            $sqlUsuario = "SELECT `id_usuario` FROM `usuarios` WHERE `mail_usuario` = ? and `status` = 'Ativo'";
-            $stmtUsuario = mysqli_prepare($conexao, $sqlUsuario);
-            mysqli_stmt_bind_param($stmtUsuario, "s", $usuario);
-            mysqli_stmt_execute($stmtUsuario);
-            $resultUsuario = mysqli_stmt_get_result($stmtUsuario);
-            $rowUsuario = mysqli_fetch_array($resultUsuario);
-            $idUsuario = $rowUsuario['id_usuario'];
+$sqlUsuario = "SELECT `id_usuario` FROM `usuarios` WHERE `mail_usuario` = ? and `status` = 'Ativo'";
+$stmtUsuario = mysqli_prepare($conexao, $sqlUsuario);
+mysqli_stmt_bind_param($stmtUsuario, "s", $usuario);
+mysqli_stmt_execute($stmtUsuario);
+$resultUsuario = mysqli_stmt_get_result($stmtUsuario);
+$rowUsuario = mysqli_fetch_array($resultUsuario);
+$idUsuario = $rowUsuario['id_usuario'];
 
-            $sqlCarrinho = "SELECT carrinho.*, estoque.nomeproduto FROM carrinho
-                            INNER JOIN estoque ON carrinho.id_produto = estoque.id_estoque
-                            WHERE carrinho.id_usuario = ?";
-            $stmtCarrinho = mysqli_prepare($conexao, $sqlCarrinho);
-            mysqli_stmt_bind_param($stmtCarrinho, "i", $idUsuario);
-            mysqli_stmt_execute($stmtCarrinho);
-            $resultCarrinho = mysqli_stmt_get_result($stmtCarrinho);
+$sqlCarrinho = "SELECT carrinho.*, produtos.nome_produto, produtos.preco_produto FROM carrinho
+                INNER JOIN produtos ON carrinho.id_produto = produtos.id_produto
+                WHERE carrinho.id_usuario = ?";
+$stmtCarrinho = mysqli_prepare($conexao, $sqlCarrinho);
+mysqli_stmt_bind_param($stmtCarrinho, "i", $idUsuario);
+mysqli_stmt_execute($stmtCarrinho);
+$resultCarrinho = mysqli_stmt_get_result($stmtCarrinho);
 
-            while ($array = mysqli_fetch_array($resultCarrinho)) {
-                $idCarrinho = $array['id_carrinho'];
-                $nomeproduto = $array['nomeproduto'];
-                $precoUnitario = $array['preco_unitario'];
-                $quantidade = $array['quantidade'];
-                $subtotal = $array['subtotal'];
-            ?>
-                <tr>
-                    <td><?= $nomeproduto; ?></td>
-                    <td>R$ <?= $precoUnitario; ?></td>
-                    <td>
-                        <input type="number" id="quantidade_<?= $idCarrinho; ?>" value="<?= $quantidade; ?>" min="1">
-                        <button class="btn btn-info btn-sm" onclick="atualizarQuantidade(<?= $idCarrinho; ?>)">Atualizar</button>
-                    </td>
-                    <td>R$ <?= $subtotal; ?></td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" onclick="removerDoCarrinho(<?= $idCarrinho; ?>)">Remover</button>
-                    </td>
-                </tr>
-            <?php } ?>
-        </table>
+while ($array = mysqli_fetch_array($resultCarrinho)) {
+    $idCarrinho = $array['id_carrinho'];
+    $nomeProduto = $array['nome_produto'];
+    $precoUnitario = $array['preco_produto'];
+    $quantidade = $array['quantidade'];
+    $subtotal = $quantidade * $precoUnitario;
+    ?>
+    <tr>
+        <td><?= $nomeProduto; ?></td>
+        <td>R$ <?= $precoUnitario; ?></td>
+        <td>
+            <input type="number" id="quantidade_<?= $idCarrinho; ?>" value="<?= $quantidade; ?>" min="1">
+            <button class="btn btn-info btn-sm" onclick="atualizarQuantidade(<?= $idCarrinho; ?>)">Atualizar</button>
+        </td>
+        <td>R$ <?= $subtotal; ?></td>
+        <td>
+            <button class="btn btn-danger btn-sm" onclick="removerDoCarrinho(<?= $idCarrinho; ?>)">Remover</button>
+        </td>
+    </tr>
+<?php } ?>
+</table>
 
-        <?php
-        $sqlTotal = "SELECT SUM(subtotal) AS total FROM carrinho WHERE id_usuario = ?";
-        $stmtTotal = mysqli_prepare($conexao, $sqlTotal);
-        mysqli_stmt_bind_param($stmtTotal, "i", $idUsuario);
-        mysqli_stmt_execute($stmtTotal);
-        $resultTotal = mysqli_stmt_get_result($stmtTotal);
-        $rowTotal = mysqli_fetch_assoc($resultTotal);
-        $valorTotal = $rowTotal['total'];
-        ?>
-        <div style="text-align: right; margin-top:20px;">
-            <p>Valor Total: R$ <?= $valorTotal; ?></p>
-        </div>
+<?php
+$sqlTotal = "SELECT SUM(subtotal) AS total FROM carrinho WHERE id_usuario = ?";
+$stmtTotal = mysqli_prepare($conexao, $sqlTotal);
+mysqli_stmt_bind_param($stmtTotal, "i", $idUsuario);
+mysqli_stmt_execute($stmtTotal);
+$resultTotal = mysqli_stmt_get_result($stmtTotal);
+$rowTotal = mysqli_fetch_assoc($resultTotal);
+$valorTotal = $rowTotal['total'];
+?>
+<div style="text-align: right; margin-top:20px;">
+    <p>Valor Total: R$ <?= $valorTotal; ?></p>
+</div>
 
-        <div style="text-align: right; margin-top:20px;">
-            <button class="btn btn-danger btn-sm" onclick="limparCarrinho()">Limpar Carrinho</button>
-            <a href="pagamento.php?total=<?= $valorTotal; ?>" role="button" class="btn btn-primary btn-sm">Finalizar Compra</a>
-        </div>
-    </div>
+<div style="text-align: right; margin-top:20px;">
+    <button class="btn btn-danger btn-sm" onclick="limparCarrinho()">Limpar Carrinho</button>
+    <a href="pagamento.php?total=<?= $valorTotal; ?>" role="button" class="btn btn-primary btn-sm">Finalizar Compra</a>
+</div>
 
     <script>
         function removerDoCarrinho(idCarrinho) {

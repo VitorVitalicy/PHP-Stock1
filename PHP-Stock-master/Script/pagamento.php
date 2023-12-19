@@ -62,22 +62,22 @@
 
         <div class="row">
             <div class="col-md-6 offset-md-3">
-                <form action="processar_pagamento.php" method="post">
-                    <div class="form-group">
-                        <label for="total">Valor Total:</label>
-                        <input type="text" class="form-control" id="total" name="total" value="<?= isset($_GET['total']) ? $_GET['total'] : ''; ?>" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="forma_pagamento">Forma de Pagamento:</label>
-                        <select class="form-control" id="forma_pagamento" name="forma_pagamento" required>
-                            <option value="debito">Débito</option>
-                            <option value="credito">Crédito</option>
-                            <option value="pix">PIX</option>
-                            <option value="dinheiro">Dinheiro</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Pagar</button>
-                </form>
+            <form action="processar_pagamento.php" method="post">
+    <div class="form-group">
+        <label for="total">Valor Total:</label>
+        <input type="text" class="form-control" id="total" name="total" value="<?= isset($_GET['total']) ? $_GET['total'] : ''; ?>" readonly>
+    </div>
+    <div class="form-group">
+        <label for="forma_pagamento">Forma de Pagamento:</label>
+        <select class="form-control" id="forma_pagamento" name="forma_pagamento" required>
+            <option value="debito">Débito</option>
+            <option value="credito">Crédito</option>
+            <option value="pix">PIX</option>
+            <option value="dinheiro">Dinheiro</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Pagar</button>
+</form>
             </div>
         </div>
     </div>
